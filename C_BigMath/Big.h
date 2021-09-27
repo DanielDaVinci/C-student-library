@@ -30,11 +30,11 @@ big reset() // Конструктор
 
 ***************/
 
-big convert_int_to_big(int value) // из int
+big convert_int_to_big(long long value) // из int
 {
     big a = reset();
     int size = 0;
-    int ch = value;
+    long long ch = value;
     while (ch != 0)
     {
         size++;
@@ -215,7 +215,7 @@ big minus(big a, big b) // Разность
     return result;
 }
 
-big division(int value, long long b) // Деление
+big division(long long value, long long b) // Деление
 {
     big result = reset();
     big a = convert_int_to_big(value);
