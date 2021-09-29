@@ -1,12 +1,13 @@
 #define elif else if
 
+
 typedef struct big
 {
-    int m_int[100];
-    int m_float[100];
-    int size_int;
-    int size_float;
-    int mark;
+    short m_int[101];
+    short m_float[101];
+    short size_int;
+    short size_float;
+    short mark;
 } big;
 
 big reset() // Конструктор
@@ -35,7 +36,7 @@ big convert_int_to_big(long long value) // из int преобразует в bi
     big a = reset();
 
     a.mark = value < 0 ? -1 : 1;
-    int size = 1;
+    short size = 1;
     long long ch = value / 10;
     while (ch != 0)
     {
@@ -43,7 +44,7 @@ big convert_int_to_big(long long value) // из int преобразует в bi
         ch /= 10;
     }
     a.size_int = size;
-    for (int i = a.size_int-1; i >= 0; i--, value /= 10)
+    for (int i = a.size_int-1; i >= 0; i--, value /= 10) // записываем все числа
         a.m_int[i] = value % 10;
     return a;
 }
@@ -79,7 +80,7 @@ void input_big(big *value) // Ввод
             Ok = 1;
         else
             for (dot = 0; input_value != '\n'; input_value = getchar())
-                if (input_value >= '0' && input_value <= '9')
+                if (input_value >= '0' && input_value <= '9')                               // если это является цифрой и не выходит за границы массива
                     if ((value->size_int == sizeof(value->m_int) / sizeof(value->m_int[0])) || (value->size_float == sizeof(value->m_float) / sizeof(value->m_float[0])))
                     {
                         Ok = 1;
@@ -87,9 +88,9 @@ void input_big(big *value) // Ввод
                         break;
                     }
                     elif (!dot)
-                        value->m_int[value->size_int++] = (int)input_value-48;
+                        value->m_int[value->size_int++] = (short)input_value-48;
                     else
-                        value->m_float[value->size_float++] = (int)input_value-48;
+                        value->m_float[value->size_float++] = (short)input_value-48;
 
                 elif (( input_value == '.' ||  input_value == ',') && dot == 0)
                     dot = 1;
@@ -107,11 +108,11 @@ void print_big(big value) // Вывод
         printf("-");
     if (value.size_int == 0)
         printf("%d", 0);
-    for (int i = 0 ; i < value.size_int; i++)
+    for (int i = 0 ; i < value.size_int; i++) // выводим целую часть
         printf("%d", value.m_int[i]);
     if (value.size_float != 0)
         printf(".");
-    for (int i = 0 ; i < value.size_float; i++)
+    for (int i = 0 ; i < value.size_float; i++) // выводим дробную часть
         printf("%d", value.m_float[i]);
     printf(" ");
 }
@@ -168,13 +169,15 @@ big minus(big a, big b) // Разность
         return result;
     }
 
-    int dif;
+    short dif;
     a.size_float = max(a.size_float, b.size_float);
     for (int i = max(a.size_float, b.size_float)-1; i >= 0; i--) // вычитаем дробную часть
     {
         dif = a.m_float[i] - b.m_float[i];
         if (dif >= 0)
+        {
             a.m_float[i] = dif;
+        }
         elif (i == 0)
         {
             a.m_float[i] = 10 + dif;
@@ -186,7 +189,7 @@ big minus(big a, big b) // Разность
             b.m_float[i-1] += 1;
         }
     }
-    for (int i = b.size_int-1 ; i >= 0; i--) // вычитаем целую часть
+    for (int i = b.size_int-1 ; i >= 0; i--)                       // вычитаем целую часть
     {
         dif = a.m_int[i + (a.size_int - b.size_int)] - b.m_int[i];
         if (dif >= 0)
@@ -206,12 +209,12 @@ big minus(big a, big b) // Разность
         }
     }
 
-    for (int i = 0; i < a.size_int; i++)
+    for (int i = 0; i < a.size_int; i++)                      // убираем незначащин нули до запятой
         if ((a.m_int[i] != 0) || (i == a.size_int-1))
             for (; i < a.size_int; i++)
                 result.m_int[result.size_int++] = a.m_int[i];
 
-    for (int i = a.size_float-1; i >= 0; i--)
+    for (int i = a.size_float-1; i >= 0; i--)                 // убираем незначащин нули после запятой
         if (a.m_float[i] != 0)
             for (; i >= 0; i--, result.size_float++)
                 result.m_float[i] = a.m_float[i];
@@ -234,9 +237,9 @@ big plus(big a, big b) // Разность
         b = c;
     }
 
-    int dif;
+    short dif;
     a.size_float = max(a.size_float, b.size_float);
-    for (int i = max(a.size_float, b.size_float)-1; i >= 0; i--)
+    for (int i = max(a.size_float, b.size_float)-1; i >= 0; i--) // сладываем дробную часть
     {
         dif = a.m_float[i] + b.m_float[i];
         if (i == 0)
@@ -250,7 +253,7 @@ big plus(big a, big b) // Разность
             b.m_float[i-1] += dif / 10;
         }
     }
-    for (int i = b.size_int-1 ; i >= 0; i--)
+    for (int i = b.size_int-1 ; i >= 0; i--)                         // складываем целую часть
     {
         dif = a.m_int[i + (a.size_int - b.size_int)] + b.m_int[i];
         a.m_int[i + (a.size_int - b.size_int)] = dif % 10;
@@ -272,12 +275,12 @@ big plus(big a, big b) // Разность
                 b.m_int[i-1] += 1;
     }
 
-    for (int i = 0; i < a.size_int; i++)
+    for (int i = 0; i < a.size_int; i++)                      // убираем незначащин нули до запятой
         if ((a.m_int[i] != 0) || (i == a.size_int-1))
             for (; i < a.size_int; i++)
                 result.m_int[result.size_int++] = a.m_int[i];
 
-    for (int i = a.size_float-1; i >= 0; i--)
+    for (int i = a.size_float-1; i >= 0; i--)                 // убираем незначащин нули после запятой
         if (a.m_float[i] != 0)
             for (; i >= 0; i--, result.size_float++)
                 result.m_float[i] = a.m_float[i];
@@ -285,7 +288,7 @@ big plus(big a, big b) // Разность
     return result;
 }
 
-big division(long long value, long long b) // Деление
+big divide(long long value, long long b) // Деление
 {
     big result = reset();
     big a = convert_int_to_big(value);
@@ -296,7 +299,6 @@ big division(long long value, long long b) // Деление
     {
         while (ch / b == 0 && j < a.size_int)
             ch = ch * 10 + a.m_int[j++];
-
         if (j <= a.size_int)
         {
             result.m_int[result.size_int++] = ch / b;
@@ -318,7 +320,7 @@ big division(long long value, long long b) // Деление
     return result;
 }
 
-big division_big(big a, big b) // Деление
+big divide_big(big a, big b) // Деление
 {
     big result = reset();
     result.mark = a.mark * b.mark;
@@ -332,9 +334,8 @@ big division_big(big a, big b) // Деление
         {
             int j;
             for (j = 0; compare(ch, b) >= 0; j++)
-            {
                 ch = minus(ch, b);
-            }
+
             result.m_int[result.size_int++] = j;
         }
     }
@@ -348,9 +349,8 @@ big division_big(big a, big b) // Деление
         }
         int j;
         for (j = 0; compare(ch, b) >= 0; j++)
-        {
             ch = minus(ch, b);
-        }
+
         result.size_float += pos;
         result.m_float[result.size_float-1] = j;
     }
